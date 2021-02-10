@@ -1,0 +1,121 @@
+<!-- ~ Copyright 2017 Uppsala University Library ~ ~ This file is part of 
+	Cora. ~ ~ Cora is free software: you can redistribute it and/or modify ~ 
+	it under the terms of the GNU General Public License as published by ~ the 
+	Free Software Foundation, either version 3 of the License, or ~ (at your 
+	option) any later version. ~ ~ Cora is distributed in the hope that it will 
+	be useful, ~ but WITHOUT ANY WARRANTY; without even the implied warranty 
+	of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the ~ GNU General 
+	Public License for more details. ~ ~ You should have received a copy of the 
+	GNU General Public License ~ along with Cora. If not, see <http://www.gnu.org/licenses />. -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>se.uu.ub.cora</groupId>
+		<artifactId>cora-parent</artifactId>
+		<version>1.1.1</version>
+	</parent>
+
+	<artifactId>synchronizer</artifactId>
+	<version>2.8-SNAPSHOT</version>
+	<packaging>war</packaging>
+
+	<name>synchronizer</name>
+
+	<properties>
+		<logger.version>2.1.0</logger.version>
+		<gatekeepertokenprovider.version>2.1.0</gatekeepertokenprovider.version>
+		<javax.ws.rs.version>2.1.1</javax.ws.rs.version>
+		<jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
+		<jersey.version>2.31</jersey.version>
+		<servlet-api.version>4.0.1</servlet-api.version>
+		<encoder.version>1.2.2</encoder.version>
+		<coralog4j.version>2.1.0</coralog4j.version>
+	</properties>
+
+	<scm>
+		<connection>scm:git:https://github.com/lsu-ub-uu/cora-synchronizer.git</connection>
+		<developerConnection>scm:git:https://github.com/lsu-ub-uu/cora-synchronizer.git</developerConnection>
+		<url>https://github.com/lsu-ub-uu/cora-synchronizer.git</url>
+	  <tag>HEAD</tag>
+  </scm>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>gatekeepertokenprovider</artifactId>
+			<version>${gatekeepertokenprovider.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>logger</artifactId>
+			<version>${logger.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${coralog4j.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${testng.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>${javax.ws.rs.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+			<version>${jersey.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-common</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.inject</groupId>
+			<artifactId>jersey-hk2</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.owasp.encoder</groupId>
+			<artifactId>encoder</artifactId>
+			<version>${encoder.version}</version>
+		</dependency>
+		<!-- The JAXB APIs are considered to be Java EE APIs, and therefore are 
+			no longer contained on the default class path in Java SE 9. In Java 11 they 
+			are completely removed from the JDK. -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>${jaxb-api.version}</version>
+			<exclusions>
+		        <exclusion>
+		            <groupId>javax.activation</groupId>
+		            <artifactId>javax.activation-api</artifactId>
+		        </exclusion>
+		    </exclusions>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>synchronizer</finalName>
+	</build>
+</project>
