@@ -25,83 +25,52 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.javaclient.cora.CoraClient;
+import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
+import se.uu.ub.cora.logger.Logger;
+import se.uu.ub.cora.logger.LoggerProvider;
+import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
+
 public class CoraIndexerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
+	private static Logger log = LoggerProvider.getLoggerForClass(CoraIndexerServlet.class);
+
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// String userIdFromIdp = request.getHeader("eppn");
-		// UserInfo userInfo = UserInfo.withLoginId(userIdFromIdp);
-		// AuthToken authTokenFromGatekeeper = getNewAuthTokenFromGatekeeper(userInfo);
-		//
-		// String url = IdpLoginInstanceProvider.getInitInfo().get("tokenLogoutURL");
-		//
-		// tryToCreateAnswerHtmlToResponseUsingResponseAndAuthTokenAndUrlAndUserId(response,
-		// authTokenFromGatekeeper, url, userIdFromIdp);
+
+		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getClientFactory();
+
+		// don't know what this should be yet
+		CoraClient coraClient = factorCoraClient(clientFactory);
+		String recordType = request.getParameter("recordType");
+		String recordId = request.getParameter("recordId");
+		ClientDataRecord readRecord = readRecord(coraClient, recordType, recordId);
+
+		log.logInfoUsingMessage(
+				"Indexing record with recordType: " + recordType + " and recordId: " + recordId);
+		String indexData = coraClient.indexData(readRecord);
+		// fånga CoraClientException, ingen indexlänk
+		response.setStatus(HttpServletResponse.SC_OK);
+		log.logInfoUsingMessage("Indexing finished for record with recordType: " + recordType
+				+ " and recordId: " + recordId);
+
 	}
 
-	// private void tryToCreateAnswerHtmlToResponseUsingResponseAndAuthTokenAndUrlAndUserId(
-	// HttpServletResponse response, AuthToken authTokenFromGatekeeper, String url,
-	// String userIdFromIdp) {
-	// try (PrintWriter out = response.getWriter();) {
-	// createAnswerHtmlToResponseUsingResponseAndAuthTokenAndUrl(authTokenFromGatekeeper, url,
-	// out);
-	// } catch (IOException e) {
-	// throw IdpLoginOnlySharingKnownInformationException.forUserId(userIdFromIdp);
-	// }
-	// }
-	//
-	// private void createAnswerHtmlToResponseUsingResponseAndAuthTokenAndUrl(AuthToken authToken,
-	// String url, PrintWriter out) {
-	// out.println("<!DOCTYPE html>");
-	// out.println("<html><head>");
-	// out.println("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>");
-	//
-	// out.println("<script type=\"text/javascript\">");
-	// out.println("window.onload = start;");
-	// out.println("function start() {");
-	// out.println("var authInfo = {");
-	// out.println("\"userId\" : \"" + Encode.forJavaScript(authToken.idFromLogin) + "\",");
-	// out.print("\"token\" : \"");
-	// out.print(Encode.forJavaScript(authToken.token));
-	// out.println("\",");
-	// out.print("\"idFromLogin\" : \"");
-	// out.print(Encode.forJavaScript(authToken.idFromLogin));
-	// out.println("\",");
-	// out.print("\"validForNoSeconds\" : \"");
-	// out.print(authToken.validForNoSeconds);
-	// out.println("\",");
-	// out.println("\"actionLinks\" : {");
-	// out.println("\"delete\" : {");
-	// out.println("\"requestMethod\" : \"DELETE\",");
-	// out.println("\"rel\" : \"delete\",");
-	// out.print("\"url\" : \"" + Encode.forJavaScript(url + authToken.idInUserStorage));
-	// out.println("\"");
-	// out.println("}");
-	// out.println("}");
-	// out.println("};");
-	// out.println(
-	// "window.opener.postMessage(authInfo, \""
-	// + Encode.forJavaScript(
-	// IdpLoginInstanceProvider.getInitInfo().get("mainSystemDomain"))
-	// + "\");");
-	//
-	// out.println("window.opener.focus();");
-	// out.println("window.close();");
-	// out.println("}");
-	// out.println("</script>");
-	//
-	// out.println("<body>");
-	// out.println("</body></html>");
-	// }
-	//
-	// private AuthToken getNewAuthTokenFromGatekeeper(UserInfo userInfo) {
-	// GatekeeperTokenProvider gatekeeperTokenProvider = IdpLoginInstanceProvider
-	// .getGatekeeperTokenProvider();
-	//
-	// return gatekeeperTokenProvider.getAuthTokenForUserInfo(userInfo);
-	// }
+	private ClientDataRecord readRecord(CoraClient coraClient, String recordType, String recordId) {
+		log.logInfoUsingMessage("Reading record with recordType: " + recordType + " and recordId: "
+				+ recordId + " for indexing");
+		return coraClient.readAsDataRecord(recordType, recordId);
+	}
+
+	private CoraClient factorCoraClient(CoraClientFactory clientFactory) {
+		String predefinedUserId = "predefinedUserId";
+		String predefinedApptoken = "someKnownApptoken";
+
+		return clientFactory.factor(predefinedUserId, predefinedApptoken);
+	}
 
 }
