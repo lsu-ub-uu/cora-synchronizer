@@ -24,15 +24,19 @@ import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
 
 public class CoraClientFactorySpy implements CoraClientFactory {
 
-	public CoraClient returnedClient;
+	public CoraClientSpy returnedClient;
 	public String userId;
 	public String appToken;
+	public boolean throwErrorOnIndex = false;
+	public String errorToThrow = "CoraClientException";
 
 	@Override
 	public CoraClient factor(String userId, String appToken) {
 		this.userId = userId;
 		this.appToken = appToken;
 		returnedClient = new CoraClientSpy();
+		returnedClient.throwErrorOnIndex = throwErrorOnIndex;
+		returnedClient.errorToThrow = errorToThrow;
 		return returnedClient;
 	}
 

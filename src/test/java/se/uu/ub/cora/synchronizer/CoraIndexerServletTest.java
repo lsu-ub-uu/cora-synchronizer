@@ -86,7 +86,7 @@ public class CoraIndexerServletTest {
 	public void testCoraClient() throws ServletException, IOException {
 
 		loginServlet.doGet(request, response);
-		CoraClientSpy coraClient = (CoraClientSpy) clientFactory.returnedClient;
+		CoraClientSpy coraClient = clientFactory.returnedClient;
 		assertTrue(coraClient.readAsDataRecordWasCalled);
 		assertEquals(coraClient.recordTypes.get(0), request.parametersToReturn.get("recordType"));
 		assertEquals(coraClient.recordIds.get(0), request.parametersToReturn.get("recordId"));
@@ -96,7 +96,7 @@ public class CoraIndexerServletTest {
 	@Test
 	public void testIndexData() throws ServletException, IOException {
 		loginServlet.doGet(request, response);
-		CoraClientSpy coraClient = (CoraClientSpy) clientFactory.returnedClient;
+		CoraClientSpy coraClient = clientFactory.returnedClient;
 		ClientDataRecord dataRecord = coraClient.dataRecordToReturn;
 		assertSame(dataRecord, coraClient.dataRecordSentToIndex);
 		assertEquals(response.status, 200);
@@ -110,10 +110,39 @@ public class CoraIndexerServletTest {
 		LoggerSpy loggerSpy = loggerFactorySpy.createdLoggers.get("CoraIndexerServlet");
 
 		assertEquals(loggerSpy.infoMessages.get(0),
-				"Reading record with recordType: someRecordType and recordId: someRecordId for indexing");
+				"Reading for indexing record. RecordType: someRecordType and recordId: someRecordId");
 		assertEquals(loggerSpy.infoMessages.get(1),
-				"Indexing record with recordType: someRecordType and recordId: someRecordId");
+				"Indexing record. RecordType: someRecordType and recordId: someRecordId");
 		assertEquals(loggerSpy.infoMessages.get(2),
-				"Indexing finished for record with recordType: someRecordType and recordId: someRecordId");
+				"Indexing finished. RecordType: someRecordType and recordId: someRecordId");
+	}
+
+	@Test
+	public void testIndexWithNoIndexlink() throws ServletException, IOException {
+		clientFactory.throwErrorOnIndex = true;
+
+		loginServlet.doGet(request, response);
+		assertEquals(response.status, 405);
+
+		LoggerSpy loggerSpy = loggerFactorySpy.createdLoggers.get("CoraIndexerServlet");
+
+		assertEquals(loggerSpy.errorMessages.get(0),
+				"Error when indexing record. RecordType: someRecordType and recordId: someRecordId. Some error from spy");
+
+	}
+
+	@Test
+	public void testIndexWhenOtherErrorIsThrown() throws ServletException, IOException {
+		clientFactory.throwErrorOnIndex = true;
+		clientFactory.errorToThrow = "RuntimeException";
+
+		loginServlet.doGet(request, response);
+		assertEquals(response.status, 400);
+
+		LoggerSpy loggerSpy = loggerFactorySpy.createdLoggers.get("CoraIndexerServlet");
+
+		assertEquals(loggerSpy.errorMessages.get(0),
+				"Error when indexing record. RecordType: someRecordType and recordId: someRecordId. Some runtime error from spy");
+
 	}
 }

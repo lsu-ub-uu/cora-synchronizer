@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import se.uu.ub.cora.clientdata.ClientDataRecord;
 import se.uu.ub.cora.javaclient.cora.CoraClient;
+import se.uu.ub.cora.javaclient.cora.CoraClientException;
 import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
 import se.uu.ub.cora.logger.Logger;
 import se.uu.ub.cora.logger.LoggerProvider;
@@ -36,41 +37,51 @@ public class CoraIndexerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerProvider.getLoggerForClass(CoraIndexerServlet.class);
-
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		Logger log = LoggerProvider.getLoggerForClass(CoraIndexerServlet.class);
 
-		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getClientFactory();
-
-		// don't know what this should be yet
-		CoraClient coraClient = factorCoraClient(clientFactory);
 		String recordType = request.getParameter("recordType");
 		String recordId = request.getParameter("recordId");
-		ClientDataRecord readRecord = readRecord(coraClient, recordType, recordId);
+		CoraClient coraClient = factorCoraClient();
+		ClientDataRecord readRecord = readRecord(coraClient, recordType, recordId, log);
 
-		log.logInfoUsingMessage(
-				"Indexing record with recordType: " + recordType + " and recordId: " + recordId);
-		String indexData = coraClient.indexData(readRecord);
-		// fånga CoraClientException, ingen indexlänk
-		response.setStatus(HttpServletResponse.SC_OK);
-		log.logInfoUsingMessage("Indexing finished for record with recordType: " + recordType
-				+ " and recordId: " + recordId);
+		String commonLogMessage = " RecordType: " + recordType + " and recordId: " + recordId;
+		log.logInfoUsingMessage("Indexing record." + commonLogMessage);
+
+		try {
+			coraClient.indexData(readRecord);
+			response.setStatus(HttpServletResponse.SC_OK);
+			log.logInfoUsingMessage("Indexing finished." + commonLogMessage);
+		} catch (CoraClientException cce) {
+			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+			log.logErrorUsingMessage(
+					"Error when indexing record." + commonLogMessage + ". " + cce.getMessage());
+
+		} catch (Exception e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			log.logErrorUsingMessage(
+					"Error when indexing record." + commonLogMessage + ". " + e.getMessage());
+
+		}
 
 	}
 
-	private ClientDataRecord readRecord(CoraClient coraClient, String recordType, String recordId) {
-		log.logInfoUsingMessage("Reading record with recordType: " + recordType + " and recordId: "
-				+ recordId + " for indexing");
-		return coraClient.readAsDataRecord(recordType, recordId);
-	}
-
-	private CoraClient factorCoraClient(CoraClientFactory clientFactory) {
+	private CoraClient factorCoraClient() {
+		// don't know what this should be yet
 		String predefinedUserId = "predefinedUserId";
 		String predefinedApptoken = "someKnownApptoken";
 
+		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getClientFactory();
 		return clientFactory.factor(predefinedUserId, predefinedApptoken);
+	}
+
+	private ClientDataRecord readRecord(CoraClient coraClient, String recordType, String recordId,
+			Logger log) {
+		log.logInfoUsingMessage("Reading for indexing record. RecordType: " + recordType
+				+ " and recordId: " + recordId);
+		return coraClient.readAsDataRecord(recordType, recordId);
 	}
 
 }

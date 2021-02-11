@@ -24,6 +24,7 @@ import java.util.List;
 import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.ClientDataRecord;
 import se.uu.ub.cora.javaclient.cora.CoraClient;
+import se.uu.ub.cora.javaclient.cora.CoraClientException;
 
 public class CoraClientSpy implements CoraClient {
 
@@ -32,6 +33,8 @@ public class CoraClientSpy implements CoraClient {
 	public List<String> recordTypes = new ArrayList<>();
 	public List<String> recordIds = new ArrayList<>();
 	public ClientDataRecord dataRecordSentToIndex;
+	public boolean throwErrorOnIndex = false;
+	public String errorToThrow = "CoraClientException";
 
 	@Override
 	public String create(String recordType, String json) {
@@ -98,6 +101,12 @@ public class CoraClientSpy implements CoraClient {
 
 	@Override
 	public String indexData(ClientDataRecord clientDataRecord) {
+		if (throwErrorOnIndex) {
+			if ("CoraClientException".equals(errorToThrow)) {
+				throw new CoraClientException("Some error from spy");
+			}
+			throw new RuntimeException("Some runtime error from spy");
+		}
 		dataRecordSentToIndex = clientDataRecord;
 		return "some answer from spy";
 	}

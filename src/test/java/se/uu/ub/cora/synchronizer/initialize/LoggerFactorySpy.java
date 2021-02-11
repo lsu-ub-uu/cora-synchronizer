@@ -19,7 +19,6 @@
 package se.uu.ub.cora.synchronizer.initialize;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import se.uu.ub.cora.logger.Logger;
@@ -35,14 +34,14 @@ public class LoggerFactorySpy implements LoggerFactory {
 		return createdLoggers.get(name);
 	}
 
-	public String getFatalLogMessageUsingClassNameAndNo(String className, int messageNo) {
-		List<String> fatalMessages = (createdLoggers.get(className)).fatalMessages;
-		return fatalMessages.get(messageNo);
-	}
-
-	public String getInfoLogMessageUsingClassNameAndNo(String className, int messageNo) {
-		List<String> fatalMessages = (createdLoggers.get(className)).infoMessages;
-		return fatalMessages.get(messageNo);
-	}
+	// public String getErorrLogMessageUsingClassNameAndNo(String className, int messageNo) {
+	// List<String> fatalMessages = (createdLoggers.get(className)).errorMessages;
+	// return fatalMessages.get(messageNo);
+	// }
+	//
+	// public String getInfoLogMessageUsingClassNameAndNo(String className, int messageNo) {
+	// List<String> fatalMessages = (createdLoggers.get(className)).infoMessages;
+	// return fatalMessages.get(messageNo);
+	// }
 
 }

@@ -25,12 +25,12 @@ import java.util.function.Supplier;
 import se.uu.ub.cora.logger.Logger;
 
 public class LoggerSpy implements Logger {
-	public List<String> fatalMessages = new ArrayList<>();
+	public List<String> errorMessages = new ArrayList<>();
 	public List<String> infoMessages = new ArrayList<>();
 
 	@Override
 	public void logFatalUsingMessage(String message) {
-		fatalMessages.add(message);
+
 	}
 
 	@Override
@@ -41,8 +41,7 @@ public class LoggerSpy implements Logger {
 
 	@Override
 	public void logErrorUsingMessage(String message) {
-		// TODO Auto-generated method stub
-
+		errorMessages.add(message);
 	}
 
 	@Override
