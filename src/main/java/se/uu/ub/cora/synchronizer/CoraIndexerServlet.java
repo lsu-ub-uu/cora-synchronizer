@@ -44,28 +44,39 @@ public class CoraIndexerServlet extends HttpServlet {
 
 		String recordType = request.getParameter("recordType");
 		String recordId = request.getParameter("recordId");
-		CoraClient coraClient = factorCoraClient();
-		ClientDataRecord readRecord = readRecord(coraClient, recordType, recordId, log);
 
+		int status = tryToIndexRecord(log, recordType, recordId);
+		response.setStatus(status);
+
+	}
+
+	private int tryToIndexRecord(Logger log, String recordType, String recordId) {
+		int status = HttpServletResponse.SC_OK;
 		String commonLogMessage = " RecordType: " + recordType + " and recordId: " + recordId;
-		log.logInfoUsingMessage("Indexing record." + commonLogMessage);
-
 		try {
-			coraClient.indexData(readRecord);
-			response.setStatus(HttpServletResponse.SC_OK);
-			log.logInfoUsingMessage("Indexing finished." + commonLogMessage);
+			indexRecord(recordType, recordId, commonLogMessage, log);
 		} catch (CoraClientException cce) {
-			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+			status = HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 			log.logErrorUsingMessage(
 					"Error when indexing record." + commonLogMessage + ". " + cce.getMessage());
-
 		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			status = HttpServletResponse.SC_BAD_REQUEST;
 			log.logErrorUsingMessage(
 					"Error when indexing record." + commonLogMessage + ". " + e.getMessage());
 
 		}
+		return status;
+	}
 
+	private void indexRecord(String recordType, String recordId, String commonLogMessage,
+			Logger log) {
+		CoraClient coraClient = factorCoraClient();
+		ClientDataRecord readRecord = readRecord(coraClient, recordType, recordId, log);
+
+		log.logInfoUsingMessage("Indexing record." + commonLogMessage);
+
+		coraClient.indexData(readRecord);
+		log.logInfoUsingMessage("Indexing finished." + commonLogMessage);
 	}
 
 	private CoraClient factorCoraClient() {

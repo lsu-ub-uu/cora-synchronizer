@@ -41,7 +41,6 @@ import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
 public class CoraIndexerServletTest {
 
 	private CoraIndexerServlet loginServlet;
-	// private Map<String, String> initInfo = new HashMap<>();
 	private CoraClientFactorySpy clientFactory;
 	private HttpServletRequestSpy request;
 	private LoggerFactorySpy loggerFactorySpy;
@@ -53,8 +52,6 @@ public class CoraIndexerServletTest {
 		loggerFactorySpy = new LoggerFactorySpy();
 		LoggerProvider.setLoggerFactory(loggerFactorySpy);
 
-		// initInfo.put("apptokenVerifierUrl", "http://localhost:8080/apptokenverifier/");
-		// initInfo.put("tokenLogoutURL", "http://localhost:8080/apptokenverifier/rest/apptoken/");
 		clientFactory = new CoraClientFactorySpy();
 		setUpRequestAndResponse();
 		SynchronizerInstanceProvider.setClientFactory(clientFactory);
