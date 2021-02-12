@@ -21,10 +21,11 @@ package se.uu.ub.cora.synchronizer;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,10 +33,8 @@ import javax.servlet.http.HttpServlet;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.clientdata.ClientDataRecord;
 import se.uu.ub.cora.logger.LoggerProvider;
 import se.uu.ub.cora.synchronizer.initialize.LoggerFactorySpy;
-import se.uu.ub.cora.synchronizer.initialize.LoggerSpy;
 import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
 
 public class CoraIndexerServletTest {
@@ -43,20 +42,28 @@ public class CoraIndexerServletTest {
 	private CoraIndexerServlet loginServlet;
 	private CoraClientFactorySpy clientFactory;
 	private HttpServletRequestSpy request;
-	private LoggerFactorySpy loggerFactorySpy;
+	private LoggerFactorySpy loggerFactorySpy = new LoggerFactorySpy();
 	private HttpServletResponseSpy response;
+	private String testedClassName = "CoraIndexerServlet";
+	private Map<String, String> initInfo = new HashMap<>();
 
 	@BeforeMethod
 	public void setup() {
-
-		loggerFactorySpy = new LoggerFactorySpy();
+		loggerFactorySpy.resetLogs(testedClassName);
 		LoggerProvider.setLoggerFactory(loggerFactorySpy);
 
+		setUpInitInfo();
 		clientFactory = new CoraClientFactorySpy();
 		setUpRequestAndResponse();
 		SynchronizerInstanceProvider.setClientFactory(clientFactory);
 		loginServlet = new CoraIndexerServlet();
 
+	}
+
+	private void setUpInitInfo() {
+		initInfo.put("userId", "somePredefinedUserId");
+		initInfo.put("appToken", "someKnownApptoken");
+		SynchronizerInstanceProvider.setInitInfo(initInfo);
 	}
 
 	private void setUpRequestAndResponse() {
@@ -75,8 +82,8 @@ public class CoraIndexerServletTest {
 	public void testClientFactory() throws ServletException, IOException {
 		loginServlet.doGet(request, response);
 		assertNotNull(clientFactory.returnedClient);
-		assertEquals(clientFactory.userId, "predefinedUserId");
-		assertEquals(clientFactory.appToken, "someKnownApptoken");
+		assertEquals(clientFactory.userId, initInfo.get("userId"));
+		assertEquals(clientFactory.appToken, initInfo.get("appToken"));
 	}
 
 	@Test
@@ -84,7 +91,6 @@ public class CoraIndexerServletTest {
 
 		loginServlet.doGet(request, response);
 		CoraClientSpy coraClient = clientFactory.returnedClient;
-		assertTrue(coraClient.readAsDataRecordWasCalled);
 		assertEquals(coraClient.recordTypes.get(0), request.parametersToReturn.get("recordType"));
 		assertEquals(coraClient.recordIds.get(0), request.parametersToReturn.get("recordId"));
 
@@ -94,8 +100,9 @@ public class CoraIndexerServletTest {
 	public void testIndexData() throws ServletException, IOException {
 		loginServlet.doGet(request, response);
 		CoraClientSpy coraClient = clientFactory.returnedClient;
-		ClientDataRecord dataRecord = coraClient.dataRecordToReturn;
-		assertSame(dataRecord, coraClient.dataRecordSentToIndex);
+		assertEquals(coraClient.recordTypes.get(0), request.getParameter("recordType"));
+		assertEquals(coraClient.recordIds.get(0), request.getParameter("recordId"));
+
 		assertEquals(response.status, 200);
 
 	}
@@ -104,13 +111,9 @@ public class CoraIndexerServletTest {
 	public void testLogging() throws ServletException, IOException {
 		loginServlet.doGet(request, response);
 
-		LoggerSpy loggerSpy = loggerFactorySpy.createdLoggers.get("CoraIndexerServlet");
-
-		assertEquals(loggerSpy.infoMessages.get(0),
-				"Reading for indexing record. RecordType: someRecordType and recordId: someRecordId");
-		assertEquals(loggerSpy.infoMessages.get(1),
+		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 0),
 				"Indexing record. RecordType: someRecordType and recordId: someRecordId");
-		assertEquals(loggerSpy.infoMessages.get(2),
+		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 1),
 				"Indexing finished. RecordType: someRecordType and recordId: someRecordId");
 	}
 
@@ -119,12 +122,10 @@ public class CoraIndexerServletTest {
 		clientFactory.throwErrorOnIndex = true;
 
 		loginServlet.doGet(request, response);
-		assertEquals(response.status, 405);
+		assertEquals(response.status, 401);
 
-		LoggerSpy loggerSpy = loggerFactorySpy.createdLoggers.get("CoraIndexerServlet");
-
-		assertEquals(loggerSpy.errorMessages.get(0),
-				"Error when indexing record. RecordType: someRecordType and recordId: someRecordId. Some error from spy");
+		assertEquals(loggerFactorySpy.getErrorLogMessageUsingClassNameAndNo(testedClassName, 0),
+				"CoraClient error when indexing record. RecordType: someRecordType and recordId: someRecordId. Some error from spy");
 
 	}
 
@@ -136,9 +137,7 @@ public class CoraIndexerServletTest {
 		loginServlet.doGet(request, response);
 		assertEquals(response.status, 400);
 
-		LoggerSpy loggerSpy = loggerFactorySpy.createdLoggers.get("CoraIndexerServlet");
-
-		assertEquals(loggerSpy.errorMessages.get(0),
+		assertEquals(loggerFactorySpy.getErrorLogMessageUsingClassNameAndNo(testedClassName, 0),
 				"Error when indexing record. RecordType: someRecordType and recordId: someRecordId. Some runtime error from spy");
 
 	}

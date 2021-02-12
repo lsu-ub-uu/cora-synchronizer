@@ -57,7 +57,7 @@ public class SynchronizerInstanceProviderTest {
 	public void testClientFactory() {
 		CoraClientFactory gatekeeperTokenProvider = new CoraClientFactorySpy();
 		SynchronizerInstanceProvider.setClientFactory(gatekeeperTokenProvider);
-		assertEquals(SynchronizerInstanceProvider.getClientFactory(), gatekeeperTokenProvider);
+		assertEquals(SynchronizerInstanceProvider.getCoraClientFactory(), gatekeeperTokenProvider);
 	}
 
 	@Test

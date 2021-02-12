@@ -25,7 +25,6 @@ import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
 
 public final class SynchronizerInstanceProvider {
 
-	// private static GatekeeperTokenProvider gatekeeperTokenProvider;
 	private static Map<String, String> initInfo;
 	private static CoraClientFactory clientFactory;
 
@@ -33,16 +32,6 @@ public final class SynchronizerInstanceProvider {
 		// not called
 		throw new UnsupportedOperationException();
 	}
-
-	// public static void setGatekeeperTokenProvider(GatekeeperTokenProvider
-	// gatekeeperTokenProvider) {
-	// SynchronizerInstanceProvider.gatekeeperTokenProvider = gatekeeperTokenProvider;
-
-	// }
-
-	// public static GatekeeperTokenProvider getGatekeeperTokenProvider() {
-	// return gatekeeperTokenProvider;
-	// }
 
 	public static void setInitInfo(Map<String, String> initInfo) {
 		SynchronizerInstanceProvider.initInfo = initInfo;
@@ -58,7 +47,7 @@ public final class SynchronizerInstanceProvider {
 
 	}
 
-	public static CoraClientFactory getClientFactory() {
+	public static CoraClientFactory getCoraClientFactory() {
 		return clientFactory;
 	}
 

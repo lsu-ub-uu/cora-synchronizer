@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import se.uu.ub.cora.clientdata.ClientDataRecord;
 import se.uu.ub.cora.javaclient.cora.CoraClient;
 import se.uu.ub.cora.javaclient.cora.CoraClientException;
 import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
@@ -36,63 +35,63 @@ import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
 public class CoraIndexerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+	private static Logger log = LoggerProvider.getLoggerForClass(CoraIndexerServlet.class);
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Logger log = LoggerProvider.getLoggerForClass(CoraIndexerServlet.class);
 
 		String recordType = request.getParameter("recordType");
 		String recordId = request.getParameter("recordId");
 
-		int status = tryToIndexRecord(log, recordType, recordId);
+		int status = tryToIndexRecord(recordType, recordId);
 		response.setStatus(status);
 
 	}
 
-	private int tryToIndexRecord(Logger log, String recordType, String recordId) {
-		int status = HttpServletResponse.SC_OK;
-		String commonLogMessage = " RecordType: " + recordType + " and recordId: " + recordId;
+	private int tryToIndexRecord(String recordType, String recordId) {
 		try {
-			indexRecord(recordType, recordId, commonLogMessage, log);
+			indexRecord(recordType, recordId);
 		} catch (CoraClientException cce) {
-			status = HttpServletResponse.SC_METHOD_NOT_ALLOWED;
-			log.logErrorUsingMessage(
-					"Error when indexing record." + commonLogMessage + ". " + cce.getMessage());
+			log.logErrorUsingMessage("CoraClient error when indexing record."
+					+ getCommonLogMessagePart(recordType, recordId) + ". " + cce.getMessage());
+			return HttpServletResponse.SC_UNAUTHORIZED;
 		} catch (Exception e) {
-			status = HttpServletResponse.SC_BAD_REQUEST;
-			log.logErrorUsingMessage(
-					"Error when indexing record." + commonLogMessage + ". " + e.getMessage());
+			log.logErrorUsingMessage("Error when indexing record."
+					+ getCommonLogMessagePart(recordType, recordId) + ". " + e.getMessage());
+			return HttpServletResponse.SC_BAD_REQUEST;
 
 		}
-		return status;
+		return HttpServletResponse.SC_OK;
 	}
 
-	private void indexRecord(String recordType, String recordId, String commonLogMessage,
-			Logger log) {
+	private void indexRecord(String recordType, String recordId) {
 		CoraClient coraClient = factorCoraClient();
-		ClientDataRecord readRecord = readRecord(coraClient, recordType, recordId, log);
 
-		log.logInfoUsingMessage("Indexing record." + commonLogMessage);
-
-		coraClient.indexData(readRecord);
-		log.logInfoUsingMessage("Indexing finished." + commonLogMessage);
+		logBeforeIndexing(recordType, recordId);
+		coraClient.indexData(recordType, recordId);
+		logAfterIndexing(recordType, recordId);
 	}
 
 	private CoraClient factorCoraClient() {
-		// don't know what this should be yet
-		String predefinedUserId = "predefinedUserId";
-		String predefinedApptoken = "someKnownApptoken";
+		String userId = SynchronizerInstanceProvider.getInitInfo().get("userId");
+		String apptoken = SynchronizerInstanceProvider.getInitInfo().get("appToken");
 
-		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getClientFactory();
-		return clientFactory.factor(predefinedUserId, predefinedApptoken);
+		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getCoraClientFactory();
+		return clientFactory.factor(userId, apptoken);
 	}
 
-	private ClientDataRecord readRecord(CoraClient coraClient, String recordType, String recordId,
-			Logger log) {
-		log.logInfoUsingMessage("Reading for indexing record. RecordType: " + recordType
-				+ " and recordId: " + recordId);
-		return coraClient.readAsDataRecord(recordType, recordId);
+	private void logAfterIndexing(String recordType, String recordId) {
+		log.logInfoUsingMessage(
+				"Indexing finished." + getCommonLogMessagePart(recordType, recordId));
+	}
+
+	private void logBeforeIndexing(String recordType, String recordId) {
+		log.logInfoUsingMessage("Indexing record." + getCommonLogMessagePart(recordType, recordId));
+	}
+
+	private String getCommonLogMessagePart(String recordType, String recordId) {
+		return " RecordType: " + recordType + " and recordId: " + recordId;
 	}
 
 }

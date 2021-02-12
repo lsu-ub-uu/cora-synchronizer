@@ -80,11 +80,7 @@ public class CoraClientSpy implements CoraClient {
 
 	@Override
 	public ClientDataRecord readAsDataRecord(String recordType, String recordId) {
-		recordTypes.add(recordType);
-		recordIds.add(recordId);
-		readAsDataRecordWasCalled = true;
-		dataRecordToReturn = ClientDataRecord.withClientDataGroup(null);
-		return dataRecordToReturn;
+		return null;
 	}
 
 	@Override
@@ -101,13 +97,19 @@ public class CoraClientSpy implements CoraClient {
 
 	@Override
 	public String indexData(ClientDataRecord clientDataRecord) {
+		return null;
+	}
+
+	@Override
+	public String indexData(String recordType, String recordId) {
+		recordTypes.add(recordType);
+		recordIds.add(recordId);
 		if (throwErrorOnIndex) {
 			if ("CoraClientException".equals(errorToThrow)) {
 				throw new CoraClientException("Some error from spy");
 			}
 			throw new RuntimeException("Some runtime error from spy");
 		}
-		dataRecordSentToIndex = clientDataRecord;
 		return "some answer from spy";
 	}
 
