@@ -35,8 +35,6 @@ import se.uu.ub.cora.synchronizer.CoraClientFactorySpy;
 
 public class SynchronizerInstanceProviderTest {
 
-	private LoggerFactorySpy loggerFactorySpy;
-
 	@Test
 	public void testPrivateConstructor() throws Exception {
 		Constructor<SynchronizerInstanceProvider> constructor = SynchronizerInstanceProvider.class

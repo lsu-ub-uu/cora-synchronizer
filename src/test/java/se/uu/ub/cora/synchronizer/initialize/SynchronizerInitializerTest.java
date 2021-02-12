@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, 2018 Uppsala University Library
+ * Copyright 2021 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -43,7 +43,7 @@ public class SynchronizerInitializerTest {
 		LoggerProvider.setLoggerFactory(loggerFactorySpy);
 		source = new ServletContextSpy();
 		source.setInitParameter("apptokenVerifierURL", "http://localhost:8080/apptokenverifier/");
-		source.setInitParameter("baseURL", "http://localhost:8080/apptokenverifier/");
+		source.setInitParameter("baseURL", "http://localhost:8080/baseSystem/");
 		source.setInitParameter("userId", "someUserId");
 		source.setInitParameter("appToken", "someApptoken");
 		context = new ServletContextEvent(source);
@@ -58,7 +58,7 @@ public class SynchronizerInitializerTest {
 				.getCoraClientFactory();
 		assertEquals(clientFactory.getAppTokenVerifierUrl(),
 				"http://localhost:8080/apptokenverifier/");
-		assertEquals(clientFactory.getBaseUrl(), "http://localhost:8080/apptokenverifier/");
+		assertEquals(clientFactory.getBaseUrl(), "http://localhost:8080/baseSystem/");
 
 	}
 
@@ -86,6 +86,11 @@ public class SynchronizerInitializerTest {
 	public void testInitInfoSetInSynchronizerInstanceProvider() throws Exception {
 		synchronizerInitializer.contextInitialized(context);
 		assertEquals(SynchronizerInstanceProvider.getInitInfo().get("userId"), "someUserId");
+		assertEquals(SynchronizerInstanceProvider.getInitInfo().get("appToken"), "someApptoken");
+		assertEquals(SynchronizerInstanceProvider.getInitInfo().get("apptokenVerifierURL"),
+				"http://localhost:8080/apptokenverifier/");
+		assertEquals(SynchronizerInstanceProvider.getInitInfo().get("baseURL"),
+				"http://localhost:8080/baseSystem/");
 	}
 
 	@Test(expectedExceptions = RuntimeException.class, expectedExceptionsMessageRegExp = "Error "
@@ -170,7 +175,7 @@ public class SynchronizerInitializerTest {
 		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 1),
 				"Found http://localhost:8080/apptokenverifier/ as apptokenVerifierURL");
 		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 2),
-				"Found http://localhost:8080/apptokenverifier/ as baseURL");
+				"Found http://localhost:8080/baseSystem/ as baseURL");
 		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 3),
 				"Found userId");
 		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 4),
