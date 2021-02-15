@@ -36,11 +36,14 @@ public class CoraIndexerServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		int status = handleRequestUsingIndexer(request);
+		response.setStatus(status);
+	}
 
+	private int handleRequestUsingIndexer(HttpServletRequest request) {
 		CoraIndexer indexer = createIndexerFromRequest(request);
 		String workOrderType = request.getParameter("workOrderType");
-		int status = indexer.handleWorkorderType(workOrderType);
-		response.setStatus(status);
+		return indexer.handleWorkorderType(workOrderType);
 	}
 
 	private CoraIndexer createIndexerFromRequest(HttpServletRequest request) {
