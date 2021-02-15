@@ -46,7 +46,7 @@ public class CoraIndexerServlet extends HttpServlet {
 		String workOrderType = request.getParameter("workOrderType");
 
 		if ("removeFromIndex".equals(workOrderType)) {
-			int status = tryToRemoveFromIndex(response, recordType, recordId);
+			int status = tryToRemoveFromIndex(recordType, recordId);
 			response.setStatus(status);
 		} else {
 			int status = tryToIndexRecord(recordType, recordId);
@@ -54,8 +54,7 @@ public class CoraIndexerServlet extends HttpServlet {
 		}
 	}
 
-	private int tryToRemoveFromIndex(HttpServletResponse response, String recordType,
-			String recordId) {
+	private int tryToRemoveFromIndex(String recordType, String recordId) {
 		try {
 			removeFromIndex(recordType, recordId);
 		} catch (Exception e) {
