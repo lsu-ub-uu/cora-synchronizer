@@ -35,6 +35,7 @@ public class CoraClientSpy implements CoraClient {
 	public ClientDataRecord dataRecordSentToIndex;
 	public boolean throwErrorOnIndex = false;
 	public String errorToThrow = "CoraClientException";
+	public String methodCalled;
 
 	@Override
 	public String create(String recordType, String json) {
@@ -102,6 +103,7 @@ public class CoraClientSpy implements CoraClient {
 
 	@Override
 	public String indexData(String recordType, String recordId) {
+		methodCalled = "index";
 		recordTypes.add(recordType);
 		recordIds.add(recordId);
 		if (throwErrorOnIndex) {
@@ -111,6 +113,20 @@ public class CoraClientSpy implements CoraClient {
 			throw new RuntimeException("Some runtime error from spy");
 		}
 		return "some answer from spy";
+	}
+
+	@Override
+	public String removeFromIndex(String recordType, String recordId) {
+		methodCalled = "removeFromIndex";
+		recordTypes.add(recordType);
+		recordIds.add(recordId);
+		if (throwErrorOnIndex) {
+			if ("CoraClientException".equals(errorToThrow)) {
+				throw new CoraClientException("Some error from spy");
+			}
+			throw new RuntimeException("Some runtime error from spy");
+		}
+		return "some remove answer from spy";
 	}
 
 }

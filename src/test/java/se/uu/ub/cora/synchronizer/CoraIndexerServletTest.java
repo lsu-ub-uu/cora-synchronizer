@@ -70,6 +70,7 @@ public class CoraIndexerServletTest {
 		request = new HttpServletRequestSpy();
 		request.parametersToReturn.put("recordType", "someRecordType");
 		request.parametersToReturn.put("recordId", "someRecordId");
+		request.parametersToReturn.put("workOrderType", "index");
 		response = new HttpServletResponseSpy();
 	}
 
@@ -102,6 +103,7 @@ public class CoraIndexerServletTest {
 		CoraClientSpy coraClient = clientFactory.returnedClient;
 		assertEquals(coraClient.recordTypes.get(0), request.getParameter("recordType"));
 		assertEquals(coraClient.recordIds.get(0), request.getParameter("recordId"));
+		assertEquals(coraClient.methodCalled, "index");
 
 		assertEquals(response.status, 200);
 
@@ -139,6 +141,42 @@ public class CoraIndexerServletTest {
 
 		assertEquals(loggerFactorySpy.getErrorLogMessageUsingClassNameAndNo(testedClassName, 0),
 				"Error when indexing record. RecordType: someRecordType and recordId: someRecordId. Some runtime error from spy");
-
 	}
+
+	@Test
+	public void testRemoveFromIndex() throws ServletException, IOException {
+		request.parametersToReturn.put("workOrderType", "removeFromIndex");
+		loginServlet.doGet(request, response);
+
+		CoraClientSpy coraClient = clientFactory.returnedClient;
+		assertEquals(coraClient.recordTypes.get(0), request.getParameter("recordType"));
+		assertEquals(coraClient.recordIds.get(0), request.getParameter("recordId"));
+		assertEquals(coraClient.methodCalled, "removeFromIndex");
+		assertEquals(response.status, 200);
+	}
+
+	@Test
+	public void testLoggingWhenRemovingIndex() throws ServletException, IOException {
+		request.parametersToReturn.put("workOrderType", "removeFromIndex");
+		loginServlet.doGet(request, response);
+
+		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 0),
+				"Removing from index. RecordType: someRecordType and recordId: someRecordId");
+		assertEquals(loggerFactorySpy.getInfoLogMessageUsingClassNameAndNo(testedClassName, 1),
+				"Finished removing. RecordType: someRecordType and recordId: someRecordId");
+	}
+
+	@Test
+	public void testRemoveFromIndexWhenErrorIsThrown() throws ServletException, IOException {
+		clientFactory.throwErrorOnIndex = true;
+		clientFactory.errorToThrow = "RuntimeException";
+		request.parametersToReturn.put("workOrderType", "removeFromIndex");
+
+		loginServlet.doGet(request, response);
+		assertEquals(response.status, 400);
+
+		assertEquals(loggerFactorySpy.getErrorLogMessageUsingClassNameAndNo(testedClassName, 0),
+				"Error when removing from index. RecordType: someRecordType and recordId: someRecordId. Some runtime error from spy");
+	}
+
 }

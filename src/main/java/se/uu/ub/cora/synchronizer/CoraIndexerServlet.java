@@ -43,10 +43,47 @@ public class CoraIndexerServlet extends HttpServlet {
 
 		String recordType = request.getParameter("recordType");
 		String recordId = request.getParameter("recordId");
+		String workOrderType = request.getParameter("workOrderType");
 
-		int status = tryToIndexRecord(recordType, recordId);
-		response.setStatus(status);
+		if ("removeFromIndex".equals(workOrderType)) {
+			int status = tryToRemoveFromIndex(response, recordType, recordId);
+			response.setStatus(status);
+		} else {
+			int status = tryToIndexRecord(recordType, recordId);
+			response.setStatus(status);
+		}
+	}
 
+	private int tryToRemoveFromIndex(HttpServletResponse response, String recordType,
+			String recordId) {
+		try {
+			removeFromIndex(recordType, recordId);
+		} catch (Exception e) {
+			log.logErrorUsingMessage("Error when removing from index."
+					+ getCommonLogMessagePart(recordType, recordId) + ". " + e.getMessage());
+			return HttpServletResponse.SC_BAD_REQUEST;
+		}
+		return HttpServletResponse.SC_OK;
+	}
+
+	private void removeFromIndex(String recordType, String recordId) {
+		CoraClient coraClient = factorCoraClient();
+		logBeforeRemovingFromIndex(recordType, recordId);
+		coraClient.removeFromIndex(recordType, recordId);
+		logAfterRemovingFromIndex(recordType, recordId);
+	}
+
+	private CoraClient factorCoraClient() {
+		String userId = SynchronizerInstanceProvider.getInitInfo().get("userId");
+		String apptoken = SynchronizerInstanceProvider.getInitInfo().get("appToken");
+
+		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getCoraClientFactory();
+		return clientFactory.factor(userId, apptoken);
+	}
+
+	private void logBeforeRemovingFromIndex(String recordType, String recordId) {
+		log.logInfoUsingMessage(
+				"Removing from index." + getCommonLogMessagePart(recordType, recordId));
 	}
 
 	private int tryToIndexRecord(String recordType, String recordId) {
@@ -65,20 +102,17 @@ public class CoraIndexerServlet extends HttpServlet {
 		return HttpServletResponse.SC_OK;
 	}
 
+	private void logAfterRemovingFromIndex(String recordType, String recordId) {
+		log.logInfoUsingMessage(
+				"Finished removing." + getCommonLogMessagePart(recordType, recordId));
+	}
+
 	private void indexRecord(String recordType, String recordId) {
 		CoraClient coraClient = factorCoraClient();
 
 		logBeforeIndexing(recordType, recordId);
 		coraClient.indexData(recordType, recordId);
 		logAfterIndexing(recordType, recordId);
-	}
-
-	private CoraClient factorCoraClient() {
-		String userId = SynchronizerInstanceProvider.getInitInfo().get("userId");
-		String apptoken = SynchronizerInstanceProvider.getInitInfo().get("appToken");
-
-		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getCoraClientFactory();
-		return clientFactory.factor(userId, apptoken);
 	}
 
 	private void logAfterIndexing(String recordType, String recordId) {
