@@ -6,17 +6,18 @@ import se.uu.ub.cora.javaclient.cora.CoraClient;
 import se.uu.ub.cora.javaclient.cora.CoraClientException;
 import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
 import se.uu.ub.cora.logger.Logger;
+import se.uu.ub.cora.logger.LoggerProvider;
 import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
 
 public class CoraIndexer {
-	private Logger log;
+	private static Logger logger = LoggerProvider.getLoggerForClass(CoraIndexer.class);
+
 	private String recordType;
 	private String recordId;
 	private String typeAndIdLogPart;
 	private CoraClient coraClient;
 
-	public CoraIndexer(Logger log, String recordType, String recordId) {
-		this.log = log;
+	public CoraIndexer(String recordType, String recordId) {
 		this.recordType = recordType;
 		this.recordId = recordId;
 		typeAndIdLogPart = " RecordType: " + recordType + " and recordId: " + recordId;
@@ -62,7 +63,7 @@ public class CoraIndexer {
 	}
 
 	private void logToInfoAppendTypeAndId(String messagePart) {
-		log.logInfoUsingMessage(messagePart + typeAndIdLogPart);
+		logger.logInfoUsingMessage(messagePart + typeAndIdLogPart);
 	}
 
 	private void logAfterRemovingFromIndex() {
@@ -75,7 +76,7 @@ public class CoraIndexer {
 	}
 
 	private void logToErrorAppendTypeAndIdAndError(String message, Exception e) {
-		log.logErrorUsingMessage(message + typeAndIdLogPart + ". " + e.getMessage());
+		logger.logErrorUsingMessage(message + typeAndIdLogPart + ". " + e.getMessage());
 	}
 
 	private int tryToAddToIndex() {

@@ -25,13 +25,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import se.uu.ub.cora.logger.Logger;
-import se.uu.ub.cora.logger.LoggerProvider;
-
 public class CoraIndexerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger log = LoggerProvider.getLoggerForClass(CoraIndexerServlet.class);
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -49,7 +45,7 @@ public class CoraIndexerServlet extends HttpServlet {
 	private CoraIndexer createIndexerFromRequest(HttpServletRequest request) {
 		String recordType = request.getParameter("recordType");
 		String recordId = request.getParameter("recordId");
-		return new CoraIndexer(log, recordType, recordId);
+		return new CoraIndexer(recordType, recordId);
 	}
 
 }

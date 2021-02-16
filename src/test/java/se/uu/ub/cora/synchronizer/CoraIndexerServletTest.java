@@ -44,7 +44,7 @@ public class CoraIndexerServletTest {
 	private HttpServletRequestSpy request;
 	private LoggerFactorySpy loggerFactorySpy = new LoggerFactorySpy();
 	private HttpServletResponseSpy response;
-	private String testedClassName = "CoraIndexerServlet";
+	private String testedClassName = "CoraIndexer";
 	private Map<String, String> initInfo = new HashMap<>();
 
 	@BeforeMethod
