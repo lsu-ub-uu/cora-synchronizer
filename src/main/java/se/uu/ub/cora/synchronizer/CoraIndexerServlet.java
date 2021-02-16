@@ -25,12 +25,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import se.uu.ub.cora.javaclient.cora.CoraClient;
-import se.uu.ub.cora.javaclient.cora.CoraClientException;
-import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
 import se.uu.ub.cora.logger.Logger;
 import se.uu.ub.cora.logger.LoggerProvider;
-import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
 
 public class CoraIndexerServlet extends HttpServlet {
 
@@ -40,91 +36,20 @@ public class CoraIndexerServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		int status = handleRequestUsingIndexer(request);
+		response.setStatus(status);
+	}
 
+	private int handleRequestUsingIndexer(HttpServletRequest request) {
+		CoraIndexer indexer = createIndexerFromRequest(request);
+		String workOrderType = request.getParameter("workOrderType");
+		return indexer.handleWorkorderType(workOrderType);
+	}
+
+	private CoraIndexer createIndexerFromRequest(HttpServletRequest request) {
 		String recordType = request.getParameter("recordType");
 		String recordId = request.getParameter("recordId");
-		String workOrderType = request.getParameter("workOrderType");
-
-		if ("removeFromIndex".equals(workOrderType)) {
-			int status = tryToRemoveFromIndex(recordType, recordId);
-			response.setStatus(status);
-		} else {
-			int status = tryToIndexRecord(recordType, recordId);
-			response.setStatus(status);
-		}
-	}
-
-	private int tryToRemoveFromIndex(String recordType, String recordId) {
-		try {
-			removeFromIndex(recordType, recordId);
-		} catch (Exception e) {
-			log.logErrorUsingMessage("Error when removing from index."
-					+ getCommonLogMessagePart(recordType, recordId) + ". " + e.getMessage());
-			return HttpServletResponse.SC_BAD_REQUEST;
-		}
-		return HttpServletResponse.SC_OK;
-	}
-
-	private void removeFromIndex(String recordType, String recordId) {
-		CoraClient coraClient = factorCoraClient();
-		logBeforeRemovingFromIndex(recordType, recordId);
-		coraClient.removeFromIndex(recordType, recordId);
-		logAfterRemovingFromIndex(recordType, recordId);
-	}
-
-	private CoraClient factorCoraClient() {
-		String userId = SynchronizerInstanceProvider.getInitInfo().get("userId");
-		String apptoken = SynchronizerInstanceProvider.getInitInfo().get("appToken");
-
-		CoraClientFactory clientFactory = SynchronizerInstanceProvider.getCoraClientFactory();
-		return clientFactory.factor(userId, apptoken);
-	}
-
-	private void logBeforeRemovingFromIndex(String recordType, String recordId) {
-		log.logInfoUsingMessage(
-				"Removing from index." + getCommonLogMessagePart(recordType, recordId));
-	}
-
-	private int tryToIndexRecord(String recordType, String recordId) {
-		try {
-			indexRecord(recordType, recordId);
-		} catch (CoraClientException cce) {
-			log.logErrorUsingMessage("CoraClient error when indexing record."
-					+ getCommonLogMessagePart(recordType, recordId) + ". " + cce.getMessage());
-			return HttpServletResponse.SC_UNAUTHORIZED;
-		} catch (Exception e) {
-			log.logErrorUsingMessage("Error when indexing record."
-					+ getCommonLogMessagePart(recordType, recordId) + ". " + e.getMessage());
-			return HttpServletResponse.SC_BAD_REQUEST;
-
-		}
-		return HttpServletResponse.SC_OK;
-	}
-
-	private void logAfterRemovingFromIndex(String recordType, String recordId) {
-		log.logInfoUsingMessage(
-				"Finished removing." + getCommonLogMessagePart(recordType, recordId));
-	}
-
-	private void indexRecord(String recordType, String recordId) {
-		CoraClient coraClient = factorCoraClient();
-
-		logBeforeIndexing(recordType, recordId);
-		coraClient.indexData(recordType, recordId);
-		logAfterIndexing(recordType, recordId);
-	}
-
-	private void logAfterIndexing(String recordType, String recordId) {
-		log.logInfoUsingMessage(
-				"Indexing finished." + getCommonLogMessagePart(recordType, recordId));
-	}
-
-	private void logBeforeIndexing(String recordType, String recordId) {
-		log.logInfoUsingMessage("Indexing record." + getCommonLogMessagePart(recordType, recordId));
-	}
-
-	private String getCommonLogMessagePart(String recordType, String recordId) {
-		return " RecordType: " + recordType + " and recordId: " + recordId;
+		return new CoraIndexer(log, recordType, recordId);
 	}
 
 }
