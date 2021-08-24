@@ -27,12 +27,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
 import se.uu.ub.cora.logger.LoggerProvider;
 import se.uu.ub.cora.synchronizer.initialize.LoggerFactorySpy;
 import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
