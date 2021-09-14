@@ -16,34 +16,20 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Cora.  If not, see <http://www.gnu.org/licenses/>.
  */
+package se.uu.ub.cora.synchronizer.db;
 
-package se.uu.ub.cora.synchronizer;
+public class ClientConverterFactorySpy implements ClientConverterFactory {
 
-import se.uu.ub.cora.javaclient.cora.CoraClient;
-import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
-
-public class CoraClientFactorySpy implements CoraClientFactory {
-
-	public CoraClientSpy returnedClient;
-	public String userId;
-	public String appToken;
-	public boolean throwErrorOnIndex = false;
-	public boolean throwErrorOnUpdate = false;
-	public String errorToThrow = "CoraClientException";
+	public ClientConverterSpy returnedConverter;
 
 	@Override
-	public CoraClient factor(String userId, String appToken) {
-		this.userId = userId;
-		this.appToken = appToken;
-		returnedClient = new CoraClientSpy();
-		returnedClient.throwErrorOnIndex = throwErrorOnIndex;
-		returnedClient.throwErrorOnUpdate = throwErrorOnUpdate;
-		returnedClient.errorToThrow = errorToThrow;
-		return returnedClient;
+	public ClientConverter factorConverter() {
+		returnedConverter = new ClientConverterSpy();
+		return returnedConverter;
 	}
 
 	@Override
-	public CoraClient factorUsingAuthToken(String authToken) {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}

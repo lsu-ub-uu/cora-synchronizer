@@ -29,6 +29,10 @@
 		<cora-clientdata.version>3.10.0</cora-clientdata.version>
 		<javaclient.version>1.10.0</javaclient.version>
 		<gatekeepertokenprovider.version>2.3.0</gatekeepertokenprovider.version>
+		<xmlutils.version>1.1.0</xmlutils.version>
+		<xmlconverter.version>1.6.0</xmlconverter.version>
+		<converter.version>1.5.0</converter.version>
+		<coradata.version>5.1.0</coradata.version>
 		<javax.ws.rs.version>2.1.1</javax.ws.rs.version>
 		<jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
 		<jersey.version>3.0.2</jersey.version>
@@ -54,9 +58,31 @@
 		</dependency>
 		<dependency>
 			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>xmlutils</artifactId>
+			<version>${xmlutils.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
 			<artifactId>logger</artifactId>
 			<version>${logger.version}</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>xmlconverter</artifactId>
+			<version>${xmlconverter.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>converter</artifactId>
+			<version>${converter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>coradata</artifactId>
+			<version>${coradata.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>se.uu.ub.cora</groupId>

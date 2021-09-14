@@ -34,8 +34,10 @@ public class CoraClientSpy implements CoraClient {
 	public List<String> recordIds = new ArrayList<>();
 	public ClientDataRecord dataRecordSentToIndex;
 	public boolean throwErrorOnIndex = false;
+	public boolean throwErrorOnUpdate = false;
 	public String errorToThrow = "CoraClientException";
 	public String methodCalled;
+	public String json;
 
 	@Override
 	public String create(String recordType, String json) {
@@ -57,8 +59,17 @@ public class CoraClientSpy implements CoraClient {
 
 	@Override
 	public String update(String recordType, String recordId, String json) {
-		// TODO Auto-generated method stub
-		return null;
+		this.json = json;
+		recordTypes.add(recordType);
+		recordIds.add(recordId);
+
+		if (throwErrorOnUpdate) {
+			if ("CoraClientException".equals(errorToThrow)) {
+				throw new CoraClientException("Error from spy when updating");
+			}
+			throw new RuntimeException("Some runtime error from spy");
+		}
+		return "OK";
 	}
 
 	@Override

@@ -16,34 +16,26 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Cora.  If not, see <http://www.gnu.org/licenses/>.
  */
+package se.uu.ub.cora.synchronizer.db;
 
-package se.uu.ub.cora.synchronizer;
+import java.util.Map;
 
-import se.uu.ub.cora.javaclient.cora.CoraClient;
-import se.uu.ub.cora.javaclient.cora.CoraClientFactory;
+import se.uu.ub.cora.xmlutils.transformer.CoraTransformation;
 
-public class CoraClientFactorySpy implements CoraClientFactory {
+public class CoraTransformationSpy implements CoraTransformation {
 
-	public CoraClientSpy returnedClient;
-	public String userId;
-	public String appToken;
-	public boolean throwErrorOnIndex = false;
-	public boolean throwErrorOnUpdate = false;
-	public String errorToThrow = "CoraClientException";
+	public String inputXml;
+	public String returnedCoraXml;
 
 	@Override
-	public CoraClient factor(String userId, String appToken) {
-		this.userId = userId;
-		this.appToken = appToken;
-		returnedClient = new CoraClientSpy();
-		returnedClient.throwErrorOnIndex = throwErrorOnIndex;
-		returnedClient.throwErrorOnUpdate = throwErrorOnUpdate;
-		returnedClient.errorToThrow = errorToThrow;
-		return returnedClient;
+	public String transform(String inputXml) {
+		this.inputXml = inputXml;
+		returnedCoraXml = "some cora xml from spy";
+		return returnedCoraXml;
 	}
 
 	@Override
-	public CoraClient factorUsingAuthToken(String authToken) {
+	public String transformWithParameters(String inputXml, Map<String, Object> parameters) {
 		// TODO Auto-generated method stub
 		return null;
 	}
