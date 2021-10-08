@@ -33,16 +33,16 @@ import se.uu.ub.cora.logger.LoggerProvider;
 import se.uu.ub.cora.synchronizer.initialize.SynchronizerInstanceProvider;
 import se.uu.ub.cora.xmlutils.transformer.CoraTransformation;
 
-public class CoraDbStorer implements CoraStorer {
+public class CoraStorerImp implements CoraStorer {
 
-	private static Logger logger = LoggerProvider.getLoggerForClass(CoraDbStorer.class);
+	private static Logger logger = LoggerProvider.getLoggerForClass(CoraStorerImp.class);
 
 	private CoraTransformation transformation;
 	private CoraClient coraClient;
 
 	String typeAndIdLogPart;
 
-	public CoraDbStorer(CoraTransformation transformation) {
+	public CoraStorerImp(CoraTransformation transformation) {
 		this.transformation = transformation;
 		coraClient = factorCoraClient();
 	}

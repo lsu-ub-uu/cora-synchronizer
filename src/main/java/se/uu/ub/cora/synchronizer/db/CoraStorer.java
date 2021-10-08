@@ -18,8 +18,27 @@
  */
 package se.uu.ub.cora.synchronizer.db;
 
+/**
+ * CoraStorer takes a record in a xml format, transform it to a format suitable for Cora storage and
+ * stores the record in that format.
+ */
 public interface CoraStorer {
 
+	/**
+	 * Stores a xml record in cora storage, using recordType and recordid, which are needed by Cora
+	 * to store a record.
+	 * 
+	 * @param String
+	 *            xml, the xml to handle and store
+	 * 
+	 * @param String
+	 *            recordtype, the recordType of the record
+	 * 
+	 * @param String
+	 *            recordId, the recordId of the record
+	 * 
+	 * 
+	 */
 	int storeXML(String xml, String recordType, String recordId);
 
 }

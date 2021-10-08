@@ -51,7 +51,7 @@ public class CoraDbStorerTest {
 	private String recordType = "someRecordType";
 	private String xml = "<place id=\"1\">\n" + "	<pid>alvin-place:679</pid>\n"
 			+ "	<dsId>METADATA</dsId>\n" + "</place>";
-	private CoraDbStorer dbStorer;
+	private CoraStorerImp dbStorer;
 
 	@BeforeMethod
 	public void setUp() {
@@ -68,7 +68,7 @@ public class CoraDbStorerTest {
 
 		transformation = new CoraTransformationSpy();
 		setUpInitInfo();
-		dbStorer = new CoraDbStorer(transformation);
+		dbStorer = new CoraStorerImp(transformation);
 	}
 
 	private void setUpInitInfo() {
@@ -131,7 +131,7 @@ public class CoraDbStorerTest {
 	@Test
 	public void testCoraClientErrorOnUpdate() {
 		clientFactory.throwErrorOnUpdate = true;
-		dbStorer = new CoraDbStorer(transformation);
+		dbStorer = new CoraStorerImp(transformation);
 		int result = dbStorer.storeXML(xml, recordType, recordId);
 		assertEquals(result, HttpServletResponse.SC_UNAUTHORIZED);
 
@@ -149,7 +149,7 @@ public class CoraDbStorerTest {
 	public void testErrorOnUpdate() {
 		clientFactory.throwErrorOnUpdate = true;
 		clientFactory.errorToThrow = "RuntimeException";
-		dbStorer = new CoraDbStorer(transformation);
+		dbStorer = new CoraStorerImp(transformation);
 		int result = dbStorer.storeXML(xml, recordType, recordId);
 		assertEquals(result, HttpServletResponse.SC_BAD_REQUEST);
 
