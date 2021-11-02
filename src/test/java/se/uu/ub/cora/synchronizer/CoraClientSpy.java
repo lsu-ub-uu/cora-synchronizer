@@ -129,4 +129,16 @@ public class CoraClientSpy implements CoraClient {
 		return "some remove answer from spy";
 	}
 
+	@Override
+	public String indexDataWithoutExplicitCommit(String recordType, String recordId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String indexRecordsOfType(String recordType, String filterAsJson) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
