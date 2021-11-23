@@ -26,9 +26,9 @@
 	<properties>
 		<logger.version>2.4.0</logger.version>
 		<httphandler.version>2.4.0</httphandler.version>
-		<cora-clientdata.version>3.11.0</cora-clientdata.version>
-		<javaclient.version>1.11.0</javaclient.version>
-		<gatekeepertokenprovider.version>2.4.0</gatekeepertokenprovider.version>
+		<cora-clientdata.version>3.12.0</cora-clientdata.version>
+		<javaclient.version>1.12.0</javaclient.version>
+		<gatekeepertokenprovider.version>2.5.0</gatekeepertokenprovider.version>
 		<javax.ws.rs.version>2.1.1</javax.ws.rs.version>
 		<jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
 		<jersey.version>3.0.3</jersey.version>
