@@ -26,8 +26,8 @@
 	<properties>
 		<logger.version>2.5.0</logger.version>
 		<httphandler.version>2.6.0</httphandler.version>
-		<cora-clientdata.version>5.1.0</cora-clientdata.version>
-		<javaclient.version>1.15.0</javaclient.version>
+		<cora-clientdata.version>5.2.0</cora-clientdata.version>
+		<javaclient.version>1.16.0</javaclient.version>
 		<gatekeepertokenprovider.version>2.7.0</gatekeepertokenprovider.version>
 		<javax.ws.rs.version>2.1.1</javax.ws.rs.version>
 		<jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
